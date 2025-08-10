@@ -12,7 +12,6 @@ import {
   Building,
   User,
 } from 'lucide-react';
-import { clientService } from '../components/services/clientService';
 
 const ClientsPage = () => {
   const [clients, setClients] = useState([
@@ -60,34 +59,6 @@ const ClientsPage = () => {
     company: '',
   });
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  const fetchClients = async () => {
-    try {
-      const response = await clientService.getAll();
-      setClients(response.data);
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-    }
-  };
-
-  // Load clients from localStorage
-  useEffect(() => {
-    const savedClients = JSON.parse(localStorage.getItem('clients'));
-    if (savedClients) {
-      setClients(savedClients);
-      setFilteredClients(savedClients);
-    }
-  }, []);
-
-  // Save clients to localStorage
-  useEffect(() => {
-    localStorage.setItem('clients', JSON.stringify(clients));
-    setFilteredClients(clients);
-  }, [clients]);
-
   // Filter clients based on search term
   useEffect(() => {
     if (searchTerm) {
@@ -102,7 +73,7 @@ const ClientsPage = () => {
     }
   }, [searchTerm, clients]);
 
-  const handleAddClient = async () => {
+  const handleAddClient = () => {
     if (
       !newClient.name ||
       !newClient.email ||
@@ -113,25 +84,22 @@ const ClientsPage = () => {
       return;
     }
 
-    try {
-      const response = await clientService.create(newClient);
-      setClients([...clients, response.data.client]);
-      setNewClient({ name: '', email: '', phone: '', company: '' });
-      setShowModal(false);
-    } catch (error) {
-      console.error('Error creating client:', error);
-      alert('Failed to create client');
-    }
+    const client = {
+      id: clients.length + 1,
+      ...newClient,
+      createdBy: 'Current User',
+      timestamp: new Date().toLocaleDateString(),
+      status: 'Active',
+    };
+
+    setClients([...clients, client]);
+    setNewClient({ name: '', email: '', phone: '', company: '' });
+    setShowModal(false);
   };
-  const handleDeleteClient = async (clientId) => {
+
+  const handleDeleteClient = (clientId) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
-      try {
-        await clientService.delete(clientId);
-        setClients(clients.filter((client) => client.id !== clientId));
-      } catch (error) {
-        console.error('Error deleting client:', error);
-        alert('Failed to delete client');
-      }
+      setClients(clients.filter((client) => client.id !== clientId));
     }
   };
 
@@ -150,90 +118,96 @@ const ClientsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-          <p className="text-gray-600">
-            Manage your client relationships and data
-          </p>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-30 bg-gray-50 border-b border-gray-200 -mx-4 sm:-mx-6 px-4 sm:px-6 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+              Clients
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              Manage your client relationships and data
+            </p>
+          </div>
+          <button
+            onClick={() => setShowModal(true)}
+            className="inline-flex items-center px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Client
+          </button>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Client
-        </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Clients</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                Total Clients
+              </p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">
                 {clients.length}
               </p>
             </div>
-            <div className="bg-blue-500 p-3 rounded-lg">
-              <Users className="w-6 h-6 text-white" />
+            <div className="bg-blue-500 p-2 sm:p-3 rounded-lg">
+              <Users className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Active Clients
               </p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">
                 {clients.filter((c) => c.status === 'Active').length}
               </p>
             </div>
-            <div className="bg-green-500 p-3 rounded-lg">
-              <Building className="w-6 h-6 text-white" />
+            <div className="bg-green-500 p-2 sm:p-3 rounded-lg">
+              <Building className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Inactive Clients
               </p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">
                 {clients.filter((c) => c.status === 'Inactive').length}
               </p>
             </div>
-            <div className="bg-red-500 p-3 rounded-lg">
-              <User className="w-6 h-6 text-white" />
+            <div className="bg-red-500 p-2 sm:p-3 rounded-lg">
+              <User className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Search and Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-3 sm:space-y-0">
           <h3 className="text-lg font-semibold text-gray-900">Client List</h3>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => sortClients('name')}
               className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
             >
               <ArrowUpDown className="w-4 h-4 mr-2" />
-              Sort
+              <span className="hidden sm:inline">Sort</span>
             </button>
             <button className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
               <Filter className="w-4 h-4 mr-2" />
-              Filter
+              <span className="hidden sm:inline">Filter</span>
             </button>
             <button className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
               <Download className="w-4 h-4 mr-2" />
-              Export
+              <span className="hidden sm:inline">Export</span>
             </button>
           </div>
         </div>
@@ -250,8 +224,8 @@ const ClientsPage = () => {
           />
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -335,13 +309,82 @@ const ClientsPage = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-4">
+          {filteredClients.map((client) => (
+            <div
+              key={client.id}
+              className="bg-white border border-gray-200 rounded-lg p-4 space-y-3"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-medium text-gray-900">
+                      {client.name}
+                    </h3>
+                    <p className="text-xs text-gray-500">ID: {client.id}</p>
+                  </div>
+                </div>
+                <span
+                  className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    client.status === 'Active'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}
+                >
+                  {client.status}
+                </span>
+              </div>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-500">Email:</span>
+                  <span className="text-gray-900">{client.email}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-500">Phone:</span>
+                  <span className="text-gray-900">{client.phone}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-500">Company:</span>
+                  <span className="text-gray-900">{client.company}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-500">Created:</span>
+                  <span className="text-gray-900">{client.timestamp}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-100">
+                <button
+                  onClick={() => handleViewClient(client)}
+                  className="text-blue-600 hover:text-blue-800 p-2"
+                  title="View Client"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDeleteClient(client.id)}
+                  className="text-red-600 hover:text-red-800 p-2"
+                  title="Delete Client"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Add Client Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b sticky top-0 bg-white">
               <h2 className="text-lg font-medium">Add New Client</h2>
               <button
                 onClick={() => setShowModal(false)}
@@ -351,7 +394,7 @@ const ClientsPage = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="p-4 sm:p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Name
@@ -419,6 +462,14 @@ const ClientsPage = () => {
                 Add Client
               </button>
             </div>
+            <div className="p-4 sm:p-6 border-t sticky bottom-0 bg-white">
+              <button
+                onClick={handleAddClient}
+                className="w-full px-4 py-2 text-white rounded-md bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              >
+                Add Client
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -426,8 +477,8 @@ const ClientsPage = () => {
       {/* View Client Modal */}
       {showViewModal && selectedClient && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b sticky top-0 bg-white">
               <h2 className="text-lg font-medium">Client Details</h2>
               <button
                 onClick={() => setShowViewModal(false)}
@@ -437,7 +488,7 @@ const ClientsPage = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="p-4 sm:p-6 space-y-4">
               <div className="bg-gray-50 p-4 rounded-lg space-y-3">
                 <div>
                   <span className="font-semibold text-gray-700">Name:</span>
@@ -490,6 +541,14 @@ const ClientsPage = () => {
                   </span>
                 </div>
               </div>
+            </div>
+            <div className="p-4 sm:p-6 border-t sticky bottom-0 bg-white">
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="w-full px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

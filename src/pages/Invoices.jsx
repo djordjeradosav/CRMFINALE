@@ -25,7 +25,6 @@ const invoiceService = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`, // Laravel Sanctum token
         Accept: 'application/json',
       },
     });
@@ -41,7 +40,6 @@ const invoiceService = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         Accept: 'application/json',
       },
     });
@@ -57,7 +55,6 @@ const invoiceService = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         Accept: 'application/json',
       },
       body: JSON.stringify(data),
@@ -74,7 +71,6 @@ const invoiceService = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         Accept: 'application/json',
       },
       body: JSON.stringify(data),
@@ -92,7 +88,6 @@ const invoiceService = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         Accept: 'application/json',
       },
       body: JSON.stringify({ status }),
@@ -108,7 +103,6 @@ const invoiceService = {
     const response = await fetch(`${API_BASE_URL}/invoices/${id}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         Accept: 'application/json',
       },
     });
@@ -124,7 +118,6 @@ const invoiceService = {
     const response = await fetch(`${API_BASE_URL}/invoices/export`, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         Accept: 'text/csv',
       },
     });
@@ -141,7 +134,6 @@ const clientService = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         Accept: 'application/json',
       },
     });
@@ -266,9 +258,116 @@ const InvoicesPage = () => {
 
   // Load invoices from database
   useEffect(() => {
-    fetchInvoices();
-    fetchClients();
+    // For demo purposes, load mock data instead of API calls
+    loadMockData();
   }, []);
+
+  const loadMockData = () => {
+    // Mock invoices data
+    const mockInvoices = [
+      {
+        id: 1,
+        invoice_number: 'INV-2024-001',
+        client_name: 'Acme Corporation',
+        client_email: 'billing@acme.com',
+        amount: 2500.0,
+        tax_amount: 250.0,
+        total_amount: 2750.0,
+        due_date: '2024-02-15',
+        created_at: '2024-01-15',
+        issue_date: '2024-01-15',
+        description: 'Website development services',
+        status: 'paid',
+        client_id: 1,
+      },
+      {
+        id: 2,
+        invoice_number: 'INV-2024-002',
+        client_name: 'TechStart Inc',
+        client_email: 'finance@techstart.com',
+        amount: 1800.0,
+        tax_amount: 180.0,
+        total_amount: 1980.0,
+        due_date: '2024-02-20',
+        created_at: '2024-01-20',
+        issue_date: '2024-01-20',
+        description: 'Mobile app development',
+        status: 'pending',
+        client_id: 2,
+      },
+      {
+        id: 3,
+        invoice_number: 'INV-2024-003',
+        client_name: 'Global Solutions',
+        client_email: 'accounts@globalsolutions.com',
+        amount: 3200.0,
+        tax_amount: 320.0,
+        total_amount: 3520.0,
+        due_date: '2024-01-30',
+        created_at: '2024-01-10',
+        issue_date: '2024-01-10',
+        description: 'E-commerce platform development',
+        status: 'overdue',
+        client_id: 3,
+      },
+      {
+        id: 4,
+        invoice_number: 'INV-2024-004',
+        client_name: 'Digital Marketing Pro',
+        client_email: 'billing@digitalmarketingpro.com',
+        amount: 950.0,
+        tax_amount: 95.0,
+        total_amount: 1045.0,
+        due_date: '2024-03-01',
+        created_at: '2024-02-01',
+        issue_date: '2024-02-01',
+        description: 'SEO optimization services',
+        status: 'pending',
+        client_id: 4,
+      },
+      {
+        id: 5,
+        invoice_number: 'INV-2024-005',
+        client_name: 'Creative Design Studio',
+        client_email: 'finance@creativedesign.com',
+        amount: 1500.0,
+        tax_amount: 150.0,
+        total_amount: 1650.0,
+        due_date: '2024-02-25',
+        created_at: '2024-01-25',
+        issue_date: '2024-01-25',
+        description: 'Brand identity design',
+        status: 'paid',
+        client_id: 5,
+      },
+    ];
+
+    // Mock clients data
+    const mockClients = [
+      { id: 1, name: 'Acme Corporation', email: 'billing@acme.com' },
+      { id: 2, name: 'TechStart Inc', email: 'finance@techstart.com' },
+      {
+        id: 3,
+        name: 'Global Solutions',
+        email: 'accounts@globalsolutions.com',
+      },
+      {
+        id: 4,
+        name: 'Digital Marketing Pro',
+        email: 'billing@digitalmarketingpro.com',
+      },
+      {
+        id: 5,
+        name: 'Creative Design Studio',
+        email: 'finance@creativedesign.com',
+      },
+    ];
+
+    setInvoices(mockInvoices);
+    setFilteredInvoices(mockInvoices);
+    setClients(mockClients);
+    setLoading(false);
+  };
 
   // Filter invoices based on search term, status, amount, and date
   useEffect(() => {
@@ -417,12 +516,35 @@ const InvoicesPage = () => {
     setSubmitting(true);
 
     try {
-      // Always try to use API
-      const backendData = mapFrontendToBackend(newInvoice);
-      const response = await invoiceService.create(backendData);
-      const mappedInvoice = mapBackendToFrontend(response.data || response);
+      // Create new invoice with mock data
+      const newInvoiceData = {
+        id: Date.now(), // Use timestamp as ID for demo
+        invoice_number: `INV-2024-${String(invoices.length + 1).padStart(
+          3,
+          '0'
+        )}`,
+        client_name:
+          newInvoice.client_name ||
+          clients.find((c) => c.id === parseInt(newInvoice.client_id))?.name ||
+          'Unknown Client',
+        client_email:
+          newInvoice.client_email ||
+          clients.find((c) => c.id === parseInt(newInvoice.client_id))?.email ||
+          'No email',
+        amount: parseFloat(newInvoice.amount),
+        tax_amount: parseFloat(newInvoice.tax_amount || 0),
+        total_amount:
+          parseFloat(newInvoice.amount) +
+          parseFloat(newInvoice.tax_amount || 0),
+        due_date: newInvoice.due_date,
+        created_at: newInvoice.issue_date,
+        issue_date: newInvoice.issue_date,
+        description: newInvoice.description,
+        status: newInvoice.status,
+        client_id: parseInt(newInvoice.client_id) || 0,
+      };
 
-      setInvoices((prev) => [mappedInvoice, ...prev]);
+      setInvoices((prev) => [newInvoiceData, ...prev]);
 
       setNewInvoice({
         invoice_number: '',
@@ -442,11 +564,7 @@ const InvoicesPage = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Error creating invoice:', error);
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ general: 'Failed to create invoice. Please try again.' });
-      }
+      setErrors({ general: 'Failed to create invoice. Please try again.' });
     } finally {
       setSubmitting(false);
     }
@@ -454,27 +572,9 @@ const InvoicesPage = () => {
 
   const togglePaymentStatus = async (invoice) => {
     const newStatus = invoice.status === 'paid' ? 'pending' : 'paid';
-    const backendStatus = mapFrontendStatusToBackend(newStatus);
 
     try {
-      // Get current invoice data first
-      const currentInvoiceResponse = await invoiceService.show(invoice.id);
-      const currentInvoice = currentInvoiceResponse;
-
-      // Update with all required fields
-      const updateData = {
-        client_id: currentInvoice.client_id,
-        amount: currentInvoice.amount,
-        tax_amount: currentInvoice.tax_amount || 0,
-        issue_date: currentInvoice.issue_date,
-        due_date: currentInvoice.due_date,
-        notes: currentInvoice.notes || '',
-        items: currentInvoice.items || [],
-        status: backendStatus,
-      };
-
-      await invoiceService.update(invoice.id, updateData);
-
+      // Update invoice status in mock data
       setInvoices((prev) =>
         prev.map((inv) =>
           inv.id === invoice.id ? { ...inv, status: newStatus } : inv
@@ -493,8 +593,7 @@ const InvoicesPage = () => {
 
   const handleDeleteInvoice = async () => {
     try {
-      await invoiceService.delete(deleteInvoiceId);
-
+      // Delete invoice from mock data
       setInvoices((prev) => prev.filter((inv) => inv.id !== deleteInvoiceId));
       setShowDeleteModal(false);
       setDeleteInvoiceId(null);
@@ -532,7 +631,29 @@ const InvoicesPage = () => {
 
   const exportInvoices = async () => {
     try {
-      const blob = await invoiceService.export();
+      // Create CSV content from mock data
+      const csvContent = [
+        [
+          'Invoice Number',
+          'Client',
+          'Amount',
+          'Status',
+          'Due Date',
+          'Created Date',
+        ],
+        ...invoices.map((invoice) => [
+          invoice.invoice_number,
+          invoice.client_name,
+          invoice.amount,
+          invoice.status,
+          invoice.due_date,
+          invoice.created_at,
+        ]),
+      ]
+        .map((row) => row.join(','))
+        .join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
@@ -616,7 +737,7 @@ const InvoicesPage = () => {
   }
 
   return (
-    <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-gray-50 min-h-screen">
       {/* Success Message */}
       {successMessage && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
@@ -632,16 +753,18 @@ const InvoicesPage = () => {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
-          <p className="text-gray-600">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            Invoices
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600">
             Track and manage your invoices and payments
           </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Invoice
@@ -649,59 +772,59 @@ const InvoicesPage = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Total Invoices
               </p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">
                 {invoices.length}
               </p>
             </div>
-            <div className="bg-blue-500 p-3 rounded-lg">
-              <FileText className="w-6 h-6 text-white" />
+            <div className="bg-blue-500 p-2 sm:p-3 rounded-lg">
+              <FileText className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Paid ({paidCount})
               </p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">
                 ${paidAmount.toFixed(2)}
               </p>
             </div>
-            <div className="bg-green-500 p-3 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-white" />
+            <div className="bg-green-500 p-2 sm:p-3 rounded-lg">
+              <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Pending ({pendingCount})
               </p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">
                 ${pendingAmount.toFixed(2)}
               </p>
             </div>
-            <div className="bg-yellow-500 p-3 rounded-lg">
-              <Calendar className="w-6 h-6 text-white" />
+            <div className="bg-yellow-500 p-2 sm:p-3 rounded-lg">
+              <Calendar className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
                 Overdue ({overdueCount})
               </p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">
                 $
                 {invoices
                   .filter((inv) => inv.status === 'overdue')
@@ -712,31 +835,33 @@ const InvoicesPage = () => {
                   .toFixed(2)}
               </p>
             </div>
-            <div className="bg-red-500 p-3 rounded-lg">
-              <AlertCircle className="w-6 h-6 text-white" />
+            <div className="bg-red-500 p-2 sm:p-3 rounded-lg">
+              <AlertCircle className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600">
+                Total Revenue
+              </p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">
                 ${totalAmount.toFixed(2)}
               </p>
             </div>
-            <div className="bg-purple-500 p-3 rounded-lg">
-              <DollarSign className="w-6 h-6 text-white" />
+            <div className="bg-purple-500 p-2 sm:p-3 rounded-lg">
+              <DollarSign className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Invoice List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-3 sm:space-y-0">
           <h3 className="text-lg font-semibold text-gray-900">Invoice List</h3>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`inline-flex items-center px-3 py-2 border rounded-md text-sm font-medium transition-colors ${
@@ -746,9 +871,9 @@ const InvoicesPage = () => {
               }`}
             >
               <Filter className="w-4 h-4 mr-2" />
-              Filters
+              <span className="hidden sm:inline">Filters</span>
               <ChevronDown
-                className={`w-4 h-4 ml-2 transition-transform ${
+                className={`w-4 h-4 sm:ml-2 transition-transform ${
                   showFilters ? 'rotate-180' : ''
                 }`}
               />
@@ -768,7 +893,7 @@ const InvoicesPage = () => {
               className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
             >
               <Download className="w-4 h-4 mr-2" />
-              Export
+              <span className="hidden sm:inline">Export</span>
             </button>
           </div>
         </div>
@@ -776,7 +901,7 @@ const InvoicesPage = () => {
         {/* Advanced Filters */}
         {showFilters && (
           <div className="bg-gray-50 p-4 rounded-lg mb-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Amount Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -831,7 +956,7 @@ const InvoicesPage = () => {
               </div>
 
               {/* Date Range Filter */}
-              <div>
+              <div className="sm:col-span-2 lg:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Date Range
                 </label>
@@ -885,8 +1010,8 @@ const InvoicesPage = () => {
           />
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -1020,13 +1145,108 @@ const InvoicesPage = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card View */}
+        <div className="lg:hidden space-y-4">
+          {filteredInvoices.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <p className="text-lg font-medium mb-2">No invoices found</p>
+              <p className="text-sm">
+                {searchTerm ||
+                statusFilter !== 'all' ||
+                amountFilter.min ||
+                amountFilter.max ||
+                dateFilter.startDate ||
+                dateFilter.endDate
+                  ? 'Try adjusting your filters'
+                  : 'Create your first invoice to get started'}
+              </p>
+            </div>
+          ) : (
+            filteredInvoices.map((invoice) => (
+              <div
+                key={invoice.id}
+                className="bg-white border border-gray-200 rounded-lg p-4 space-y-3"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-sm font-medium text-gray-900">
+                      {invoice.invoice_number}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {invoice.client_name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {invoice.client_email}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-gray-900">
+                      ${parseFloat(invoice.amount).toFixed(2)}
+                    </p>
+                    {getStatusBadge(invoice.status)}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>
+                    Created: {new Date(invoice.created_at).toLocaleDateString()}
+                  </span>
+                  <span>
+                    Due: {new Date(invoice.due_date).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-100">
+                  <button
+                    onClick={() => handleViewInvoice(invoice)}
+                    className="text-blue-600 hover:text-blue-900 p-2"
+                    title="View Invoice"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => togglePaymentStatus(invoice)}
+                    className={`p-2 ${
+                      invoice.status === 'paid'
+                        ? 'text-yellow-600 hover:text-yellow-900'
+                        : 'text-green-600 hover:text-green-900'
+                    }`}
+                    title={
+                      invoice.status === 'paid'
+                        ? 'Mark as Pending'
+                        : 'Mark as Paid'
+                    }
+                  >
+                    {invoice.status === 'paid' ? (
+                      <XCircle className="w-4 h-4" />
+                    ) : (
+                      <CheckCircle className="w-4 h-4" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDeleteInvoiceId(invoice.id);
+                      setShowDeleteModal(true);
+                    }}
+                    className="text-red-600 hover:text-red-900 p-2"
+                    title="Delete Invoice"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       {/* Add Invoice Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
-            <div className="flex items-center justify-between p-6 border-b">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white">
               <h3 className="text-lg font-semibold text-gray-900">
                 Create New Invoice
               </h3>
@@ -1037,7 +1257,7 @@ const InvoicesPage = () => {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-4">
               {clients.length > 0 ? (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1227,10 +1447,10 @@ const InvoicesPage = () => {
                 </select>
               </div>
             </div>
-            <div className="flex items-center justify-end space-x-3 p-6 border-t">
+            <div className="flex items-center justify-end space-x-3 p-4 sm:p-6 border-t sticky bottom-0 bg-white">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-3 sm:px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
                 disabled={submitting}
               >
                 Cancel
@@ -1238,7 +1458,7 @@ const InvoicesPage = () => {
               <button
                 onClick={handleAddInvoice}
                 disabled={submitting}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 text-sm"
               >
                 {submitting ? 'Creating...' : 'Create Invoice'}
               </button>
@@ -1249,9 +1469,9 @@ const InvoicesPage = () => {
 
       {/* View Invoice Modal */}
       {showViewModal && selectedInvoice && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4">
-            <div className="flex items-center justify-between p-6 border-b">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white">
               <h3 className="text-lg font-semibold text-gray-900">
                 Invoice Details
               </h3>
@@ -1262,8 +1482,8 @@ const InvoicesPage = () => {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="p-4 sm:p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
                 <div>
                   <h4 className="text-sm font-medium text-gray-500 mb-2">
                     Invoice Information
@@ -1299,7 +1519,7 @@ const InvoicesPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
                 <div>
                   <h4 className="text-sm font-medium text-gray-500 mb-2">
                     Dates
@@ -1329,10 +1549,10 @@ const InvoicesPage = () => {
                 </div>
               )}
             </div>
-            <div className="flex items-center justify-end space-x-3 p-6 border-t">
+            <div className="flex items-center justify-end space-x-3 p-4 sm:p-6 border-t sticky bottom-0 bg-white">
               <button
                 onClick={() => setShowViewModal(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-3 sm:px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
               >
                 Close
               </button>
@@ -1343,11 +1563,11 @@ const InvoicesPage = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="bg-red-100 rounded-full p-3 mr-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="p-4 sm:p-6">
+              <div className="flex items-start mb-4">
+                <div className="bg-red-100 rounded-full p-3 mr-4 flex-shrink-0">
                   <AlertCircle className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
@@ -1361,16 +1581,16 @@ const InvoicesPage = () => {
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-end space-x-3 p-6 border-t">
+            <div className="flex items-center justify-end space-x-3 p-4 sm:p-6 border-t">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-3 sm:px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteInvoice}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                className="px-3 sm:px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
               >
                 Delete
               </button>

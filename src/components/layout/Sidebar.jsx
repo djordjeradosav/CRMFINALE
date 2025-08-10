@@ -1,10 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Users, BarChart3, Settings, FileText } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
 
-const Sidebar = () => {
-  const { user, canAccess, isUser } = useAuth();
+const Sidebar = ({ onClose }) => {
+  // Mock user data since we removed authentication
+  const user = {
+    name: 'Demo User',
+    role: 'admin',
+    company: 'Demo Company',
+  };
+
+  const canAccess = () => true; // Allow access to everything
+  const isUser = () => false; // Not a limited user
 
   const menuItems = [
     {
@@ -80,6 +87,7 @@ const Sidebar = () => {
             <NavLink
               key={item.id}
               to={item.path}
+              onClick={onClose} // Close sidebar on mobile when clicking a link
               className={({ isActive }) =>
                 `w-full flex items-center px-3 py-2 text-left rounded-lg transition-colors ${
                   isActive

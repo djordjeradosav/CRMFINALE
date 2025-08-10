@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
-import { X, Eye, EyeOff, Lock } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { authAPI } from '../components/services/api';
+import {
+  X,
+  Eye,
+  EyeOff,
+  Lock,
+  User,
+  Mail,
+  Building,
+  Shield,
+} from 'lucide-react';
 
 const SettingsPage = () => {
-  const { user } = useAuth();
+  // Sample user data (you can replace this with props or state management)
+  const [user] = useState({
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    company: 'Example Corp',
+    role: 'admin',
+  });
+
   const [showResetModal, setShowResetModal] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -70,7 +84,10 @@ const SettingsPage = () => {
     setLoading(true);
 
     try {
-      await authAPI.resetPassword(passwordData);
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // For demonstration purposes, we'll just show success
       setSuccessMessage('Password updated successfully!');
       setPasswordData({
         current_password: '',
@@ -82,13 +99,7 @@ const SettingsPage = () => {
         setSuccessMessage('');
       }, 2000);
     } catch (error) {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else if (error.response?.data?.message) {
-        setErrors({ general: error.response.data.message });
-      } else {
-        setErrors({ general: 'An error occurred while updating password' });
-      }
+      setErrors({ general: 'An error occurred while updating password' });
     } finally {
       setLoading(false);
     }
@@ -106,7 +117,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
       {/* Page Header */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Settings</h2>
@@ -122,78 +133,148 @@ const SettingsPage = () => {
         </div>
       )}
 
-      {/* Settings Content */}
+      {/* Account Information Card */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Account Information
-        </h3>
-        <div className="space-y-4">
+        <div className="flex items-center mb-6">
+          <User className="w-6 h-6 text-blue-600 mr-3" />
+          <h3 className="text-lg font-semibold text-gray-900">
+            Account Information
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Mail className="w-4 h-4 inline mr-2" />
               Full Name
             </label>
             <input
               type="text"
               value={user?.name || ''}
               readOnly
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
+              <Mail className="w-4 h-4 inline mr-2" />
+              Email Address
             </label>
             <input
               type="email"
               value={user?.email || ''}
               readOnly
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Building className="w-4 h-4 inline mr-2" />
               Company
             </label>
             <input
               type="text"
               value={user?.company || ''}
               readOnly
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
+              <Shield className="w-4 h-4 inline mr-2" />
               Role
             </label>
             <input
               type="text"
               value={user?.role || ''}
               readOnly
-              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 capitalize"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 capitalize"
             />
           </div>
+        </div>
+      </div>
 
-          {/* Password Reset Section */}
-          <div className="pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-700">Password</h4>
-                <p className="text-sm text-gray-500">
-                  Change your account password
-                </p>
-              </div>
-              <button
-                onClick={() => setShowResetModal(true)}
-                className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
-              >
-                <Lock className="w-4 h-4 mr-2" />
-                Reset Password
-              </button>
+      {/* Security Settings Card */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center mb-6">
+          <Lock className="w-6 h-6 text-blue-600 mr-3" />
+          <h3 className="text-lg font-semibold text-gray-900">
+            Security Settings
+          </h3>
+        </div>
+
+        <div className="border border-gray-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h4 className="text-sm font-medium text-gray-700">Password</h4>
+              <p className="text-sm text-gray-500">
+                Change your account password
+              </p>
             </div>
-            <p className="text-sm text-gray-600">
-              To update your profile information, please contact your
-              administrator.
-            </p>
+            <button
+              onClick={() => setShowResetModal(true)}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              Reset Password
+            </button>
+          </div>
+          <p className="text-sm text-gray-600">
+            To update your profile information, please contact your
+            administrator.
+          </p>
+        </div>
+      </div>
+
+      {/* Application Settings Card */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">
+          Application Settings
+        </h3>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-sm font-medium text-gray-700">
+                Email Notifications
+              </h4>
+              <p className="text-sm text-gray-500">
+                Receive email notifications for important updates
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-sm font-medium text-gray-700">Dark Mode</h4>
+              <p className="text-sm text-gray-500">Switch to dark theme</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" className="sr-only peer" />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-sm font-medium text-gray-700">
+                Auto-save Drafts
+              </h4>
+              <p className="text-sm text-gray-500">
+                Automatically save invoice drafts
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" defaultChecked className="sr-only peer" />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
           </div>
         </div>
       </div>
@@ -203,9 +284,12 @@ const SettingsPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Reset Password
-              </h3>
+              <div className="flex items-center">
+                <Lock className="w-6 h-6 text-blue-600 mr-3" />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Reset Password
+                </h3>
+              </div>
               <button
                 onClick={closeModal}
                 className="text-gray-400 hover:text-gray-600"
@@ -357,14 +441,14 @@ const SettingsPage = () => {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {loading ? 'Updating...' : 'Update Password'}
                 </button>

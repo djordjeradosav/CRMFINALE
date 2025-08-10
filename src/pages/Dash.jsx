@@ -10,11 +10,8 @@ import {
   TrendingUp,
   Target,
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
-  const { user } = useAuth();
-
   // Mock data for demo
   const stats = [
     {
@@ -90,9 +87,6 @@ const Dashboard = () => {
     },
   ];
 
-  // Don't render if user is not available
-  if (!user) return null;
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -101,8 +95,7 @@ const Dashboard = () => {
           Dashboard Overview
         </h2>
         <p className="text-gray-600">
-          Welcome back, {user.name}! Here's what's happening with your business
-          today.
+          Welcome back! Here's what's happening with your business today.
         </p>
       </div>
 
