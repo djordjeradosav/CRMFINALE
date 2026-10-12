@@ -9,7 +9,6 @@ Backend: [CRMAPPBACK](https://github.com/djordjeradosav/CRMAPPBACK) (Laravel 12 
 ## Features
 
 - **Authentication**: login/register with token auth, an `AuthContext` and protected routes
-- **Dashboard**: overview of clients and invoices
 - **Clients**: list, search, sort, filter, add, edit and delete
 - **Invoices**: create invoices per client, filter by status (pending / paid / overdue), export
 - **Settings** page
